@@ -5,7 +5,9 @@ from flask import request, jsonify, current_app
 from models import User
 
 def generate_token(user_id, expires_in=3600):
-    """Generate JWT token for a user"""
+    """
+    Generate a JWT token for a user.
+    """
     payload = {
         'user_id': user_id,
         'exp': datetime.utcnow() + timedelta(seconds=expires_in)
@@ -14,7 +16,10 @@ def generate_token(user_id, expires_in=3600):
     return token
 
 def token_required(f):
-    """Decorator to protect routes with JWT"""
+    """
+    Decorator to protect routes with JWT authentication.
+    Injects current_user into the route.
+    """
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None

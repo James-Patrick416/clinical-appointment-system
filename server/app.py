@@ -5,6 +5,8 @@ from models import db, User, Clinic, Appointment
 from schemas.user import UserSchema
 from schemas.clinic import ClinicSchema
 from schemas.appointment import AppointmentSchema
+from auth import generate_token, token_required
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Initialize app
 app = Flask(__name__)
@@ -25,9 +27,24 @@ appointments_schema = AppointmentSchema(many=True)
 def home():
     return {"message": "Clinic API is running"}
 
+# ----------------- Auth Endpoints -----------------
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    user = User.query.filter_by(email=email).first()
+    if not user or not check_password_hash(user.password_hash, password):
+        return jsonify({'message': 'Invalid credentials'}), 401
+
+    token = generate_token(user.id)
+    return jsonify({'token': token})
+
 # ----------------- User Endpoints -----------------
 @app.route('/users', methods=['GET'])
-def get_users():
+@token_required
+def get_users(current_user):
     users = User.query.all()
     return users_schema.jsonify(users)
 
@@ -37,9 +54,12 @@ def create_user():
     errors = user_schema.validate(data)
     if errors:
         return jsonify(errors), 400
+
+    password_hash = generate_password_hash(data['password'])
     user = User(
         name=data['name'],
         email=data['email'],
+        password_hash=password_hash,
         role=data['role'],
         clinic_id=data.get('clinic_id')
     )
@@ -49,16 +69,19 @@ def create_user():
 
 # ----------------- Clinic Endpoints -----------------
 @app.route('/clinics', methods=['GET'])
-def get_clinics():
+@token_required
+def get_clinics(current_user):
     clinics = Clinic.query.all()
     return clinics_schema.jsonify(clinics)
 
 @app.route('/clinics', methods=['POST'])
-def create_clinic():
+@token_required
+def create_clinic(current_user):
     data = request.get_json()
     errors = clinic_schema.validate(data)
     if errors:
         return jsonify(errors), 400
+
     clinic = Clinic(
         name=data['name'],
         location=data.get('location')
@@ -69,16 +92,19 @@ def create_clinic():
 
 # ----------------- Appointment Endpoints -----------------
 @app.route('/appointments', methods=['GET'])
-def get_appointments():
+@token_required
+def get_appointments(current_user):
     appointments = Appointment.query.all()
     return appointments_schema.jsonify(appointments)
 
 @app.route('/appointments', methods=['POST'])
-def create_appointment():
+@token_required
+def create_appointment(current_user):
     data = request.get_json()
     errors = appointment_schema.validate(data)
     if errors:
         return jsonify(errors), 400
+
     appointment = Appointment(
         date_time=data['date_time'],
         patient_id=data['patient_id'],
