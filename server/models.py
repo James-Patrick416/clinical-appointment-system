@@ -4,7 +4,6 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-# Users: patients, doctors, admin
 class User(db.Model):
     __tablename__ = "users"
 
@@ -12,9 +11,9 @@ class User(db.Model):
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.String(50), nullable=False)  # patient, doctor, admin
+    role = db.Column(db.String(50), nullable=False)
 
-    clinic_id = db.Column(db.Integer, db.ForeignKey("clinics.id"))  # for doctors
+    clinic_id = db.Column(db.Integer, db.ForeignKey("clinics.id"))
 
     appointments = db.relationship(
         "Appointment",
