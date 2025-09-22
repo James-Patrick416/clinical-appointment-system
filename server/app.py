@@ -6,12 +6,13 @@ from schemas.user import UserSchema
 from schemas.clinic import ClinicSchema
 from schemas.appointment import AppointmentSchema
 
+# Initialize app
 app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app)
 db.init_app(app)
 
-# Schemas
+# Initialize schemas
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 clinic_schema = ClinicSchema()
@@ -19,12 +20,12 @@ clinics_schema = ClinicSchema(many=True)
 appointment_schema = AppointmentSchema()
 appointments_schema = AppointmentSchema(many=True)
 
-# Home route
+# ----------------- Home -----------------
 @app.route('/')
 def home():
     return {"message": "Clinic API is running"}
 
-# ----------------- User routes -----------------
+# ----------------- User Endpoints -----------------
 @app.route('/users', methods=['GET'])
 def get_users():
     users = User.query.all()
@@ -36,7 +37,6 @@ def create_user():
     errors = user_schema.validate(data)
     if errors:
         return jsonify(errors), 400
-
     user = User(
         name=data['name'],
         email=data['email'],
@@ -47,7 +47,7 @@ def create_user():
     db.session.commit()
     return user_schema.jsonify(user), 201
 
-# ----------------- Clinic routes -----------------
+# ----------------- Clinic Endpoints -----------------
 @app.route('/clinics', methods=['GET'])
 def get_clinics():
     clinics = Clinic.query.all()
@@ -59,7 +59,6 @@ def create_clinic():
     errors = clinic_schema.validate(data)
     if errors:
         return jsonify(errors), 400
-
     clinic = Clinic(
         name=data['name'],
         location=data.get('location')
@@ -68,7 +67,7 @@ def create_clinic():
     db.session.commit()
     return clinic_schema.jsonify(clinic), 201
 
-# ----------------- Appointment routes -----------------
+# ----------------- Appointment Endpoints -----------------
 @app.route('/appointments', methods=['GET'])
 def get_appointments():
     appointments = Appointment.query.all()
@@ -80,7 +79,6 @@ def create_appointment():
     errors = appointment_schema.validate(data)
     if errors:
         return jsonify(errors), 400
-
     appointment = Appointment(
         date_time=data['date_time'],
         patient_id=data['patient_id'],
