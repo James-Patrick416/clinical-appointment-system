@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer"; 
 import Dashboard from "./pages/Dashboard.jsx";
 import Appointments from "./pages/Appointments.jsx";
 import Doctors from "./pages/Doctors.jsx";
@@ -10,6 +11,7 @@ function App() {
     <Router>
       <Navbar />
       <LandingPage/>
+      <Footer />
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/appointments" element={<Appointments />} />
@@ -17,6 +19,7 @@ function App() {
         <Route path="/patients" element={<Patients />} />
       </Routes>
     </Router>
+    
   );
 }
 
