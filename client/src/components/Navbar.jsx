@@ -1,32 +1,51 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // or from "react-icons/fi"
+import { Menu, X } from "lucide-react";
+
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // auth state
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleAuth = () => {
+    if (isAuthenticated) {
+      // handle sign out
+      setIsAuthenticated(false);
+      console.log("Signed out");
+    } else {
+      // navigate to sign in page
+      // you can use a router navigation instead of alert
+      window.location.href = "/signin";
+    }
   };
 
   return (
     <nav className="navbar">
-      {/* Navigation */}
       <div className="nav-container">
         <div className="nav-content">
           {/* Logo */}
           <div className="nav-logo">
-            <h1 className="logo-text">HealthCare</h1>
+            <Link to="/">
+              <img src="/logo1.jpeg" alt="HealthCare Logo" className="logo-img" />
+
+            </Link>
           </div>
 
           {/* Desktop Menu */}
           <div className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
             <div className="nav-links">
-              <Link to="/" className="nav-link active">Home</Link>
-              <Link to="/services" className="nav-link">Services</Link>
-              <Link to="/doctors" className="nav-link">Doctors</Link>
-              <Link to="/about" className="nav-link">About</Link>
-              <button className="nav-btn">Book Appointment</button>
+              {/* landing page sections */}
+              <a href="#home" className="nav-link active">Home</a>
+              <a href="#services" className="nav-link">Services</a>
+              <a href="#doctors" className="nav-link">Doctors</a>
+              <a href="#about" className="nav-link">About</a>
+
+              {/* Auth button */}
+              <button onClick={handleAuth} className="nav-btn">
+                {isAuthenticated ? "Sign Out" : "Sign In"}
+              </button>
             </div>
           </div>
 
