@@ -1,12 +1,32 @@
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { Search, Calendar, MessageCircle, Heart, Activity, Pill, Star, Download, Menu, X } from 'lucide-react';
 import './LandingPage.css';
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleBookAppointment = () => {
+    if (user) {
+      navigate("/appointments");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const handleFindDoctor = () => {
+    if (user) {
+      navigate("/doctors");
+    } else {
+      navigate("/login");
+    }
   };
 
   return (
@@ -25,7 +45,7 @@ const LandingPage = () => {
                 <a href="#services" className="nav-link">Services</a>
                 <a href="#doctors" className="nav-link">Doctors</a>
                 <a href="#about" className="nav-link">About</a>
-                <button className="nav-btn">Book Appointment</button>
+                <button className="nav-btn" onClick={handleBookAppointment}>Book Appointment</button>
               </div>
             </div>
             
@@ -45,7 +65,7 @@ const LandingPage = () => {
               <a href="#services" className="mobile-link">Services</a>
               <a href="#doctors" className="mobile-link">Doctors</a>
               <a href="#about" className="mobile-link">About</a>
-              <button className="mobile-btn">Book Appointment</button>
+              <button className="mobile-btn" onClick={handleBookAppointment}>Book Appointment</button>
             </div>
           </div>
         )}
@@ -65,7 +85,7 @@ const LandingPage = () => {
                 that will make you feel confident and safe in your daily life.
               </p>
               <div className="hero-buttons">
-                <button className="btn-primary">Find A Doctor</button>
+                <button className="btn-primary" onClick={handleFindDoctor}>Find A Doctor</button>
                 <button className="btn-secondary">Learn More</button>
               </div>
             </div>
@@ -229,7 +249,7 @@ const LandingPage = () => {
                   <Star size={16} />
                   <span>{doctor.rating}</span>
                 </div>
-                <button className="doctor-btn">Book Now</button>
+                <button className="doctor-btn" onClick={handleBookAppointment}>Book Now</button>
               </div>
             ))}
           </div>
