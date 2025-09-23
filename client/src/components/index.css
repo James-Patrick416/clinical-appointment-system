@@ -66,3 +66,23 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Logo wrapper */
+.nav-logo {
+  display: flex;
+  align-items: center;
+}
+
+/* Logo image */
+.logo-img {
+  height: 69px;      /* good size for most navbars */
+  width: 250px;       /* keeps correct proportions */
+  object-fit: contain;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
