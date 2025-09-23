@@ -28,37 +28,43 @@ const LandingPage = () => {
       
 
       {/* Hero Section */}
-      <section id="home" className="hero-section">
-        <div className="container">
-          <div className="hero-grid">
-            <div className="hero-content">
-              <h1 className="hero-title">
-                Find And Search Your
-                <span className="hero-title-accent">Suitable Doctor's</span>
-              </h1>
-              <p className="hero-description">
-                Join us and take care of yourself and your family with health services 
-                that will make you feel confident and safe in your daily life.
-              </p>
-              <div className="hero-buttons">
-                <button className="btn-primary">Find A Doctor</button>
-                <button className="btn-secondary">Learn More</button>
-              </div>
-            </div>
-            <div className="hero-image">
-              <div className="image-card">
-                <div className="image-content">
-                  <div className="placeholder-image">
-                    <Heart size={64} />
-                    <h3>Your Health</h3>
-                    <p>Our Priority</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+<section id="home" className="hero-section">
+  <div className="container">
+    <div className="hero-grid">
+      
+      {/* Left side: content */}
+      <div className="hero-content">
+        <h1 className="hero-title">
+          Find And Search Your
+          <span className="hero-title-accent">Suitable Doctor's</span>
+        </h1>
+        <p className="hero-description">
+          Join us and take care of yourself and your family with health services 
+          that will make you feel confident and safe in your daily life.
+        </p>
+        <div className="hero-buttons">
+          <button className="btn-primary">Find A Doctor</button>
+          <button className="btn-secondary">Learn More</button>
+        </div>
+      </div>
+
+      {/* Right side: real image instead of placeholder */}
+      <div className="hero-image">
+        <div className="image-card">
+          <div className="image-content">
+            <img
+              src="/doctor2.jpeg"   
+              alt="Doctor"
+              className="hero-real-image"
+            />
           </div>
         </div>
-      </section>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 
       {/* Steps Section */}
       <section className="steps-section">
@@ -102,36 +108,43 @@ const LandingPage = () => {
       </section>
 
       {/* Quality Service Section */}
-      <section className="quality-section">
-        <div className="container">
-          <div className="quality-grid">
-            <div className="quality-image">
-              <div className="quality-card">
-                <div className="quality-content">
-                  <div className="quality-placeholder">
-                    <Star size={64} />
-                    <h3>Quality Care</h3>
-                    <p>24/7 Available</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="quality-text">
-              <h2 className="quality-title">Best quality service with our experienced doctors</h2>
-              <p className="quality-description">
-                With our top doctors, we are able to provide best medical services above average. 
-                We have highly experienced doctors, so don't worry. They are also very talented in their fields.
-              </p>
-              <ul className="quality-list">
-                <li>Search your specialist & Online consultations anywhere</li>
-                <li>Consultation our top specialists</li>
-                <li>Doctors are available 24/7</li>
-              </ul>
-            </div>
+     <section className="quality-section">
+  <div className="container">
+    <div className="quality-grid">
+      
+      {/* Left side: real image instead of placeholder */}
+      <div className="quality-image">
+        <div className="quality-card">
+          <div className="quality-content">
+            <img 
+              src="/doctor1.jpeg"   // 👈 put your image inside /public folder
+              alt="Quality healthcare service"
+              className="quality-real-image"
+            />
           </div>
         </div>
-      </section>
+      </div>
+      
+      {/* Right side: text */}
+      <div className="quality-text">
+        <h2 className="quality-title">
+          Best quality service with our experienced doctors
+        </h2>
+        <p className="quality-description">
+          With our top doctors, we are able to provide best medical services above average. 
+          We have highly experienced doctors, so don't worry. They are also very talented in their fields.
+        </p>
+        <ul className="quality-list">
+          <li>Search your specialist & Online consultations anywhere</li>
+          <li>Consultation our top specialists</li>
+          <li>Doctors are available 24/7</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 
       {/* Services Section */}
       <section id="services" className="services-section">
@@ -212,47 +225,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Mobile App Section */}
-      <section className="app-section">
-        <div className="container">
-          <div className="app-grid">
-            <div className="app-content">
-              <h2 className="app-title">
-                Mobile apps are available
-                <span className="app-title-accent">Get HealthCare for free!</span>
-              </h2>
-              <p className="app-description">
-                Get on-demand access to a doctor on your phone with the free HealthCare mobile app. 
-                Download and register on our app for free and feel safe for all your family.
-              </p>
-              <div className="app-buttons">
-                <button className="app-btn">
-                  <Download size={20} />
-                  App Store
-                </button>
-                <button className="app-btn">
-                  <Download size={20} />
-                  Google Play
-                </button>
-              </div>
-            </div>
-            
-            <div className="app-image">
-              <div className="app-mockup">
-                <div className="mockup-content">
-                  <div className="mockup-placeholder">
-                    <div className="mockup-icon">
-                      <Heart size={32} />
-                    </div>
-                    <h3>HealthCare App</h3>
-                    <p>Available on all devices</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* CTA Section */}
       <section className="cta-section">
