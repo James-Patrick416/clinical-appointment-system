@@ -256,6 +256,12 @@
 .placeholder-image p {
   color: #bfdbfe;
 }
+.hero-real-image {
+  width: 100%;
+  height: 350px;       /* same as placeholder height */
+  border-radius: 12px;
+  object-fit: cover;   /* keeps proportions while filling */
+}
 
 /* Steps Section */
 .steps-section {
@@ -425,6 +431,13 @@
   background: #2563eb;
   border-radius: 50%;
 }
+.quality-real-image {
+  width: 100%;
+  height: 350px;     /* adjust if you want taller images */
+  border-radius: 12px;
+  object-fit: cover; /* keeps image nicely cropped */
+}
+
 
 /* Services Section */
 .services-section {
@@ -594,110 +607,7 @@
   background: #1d4ed8;
 }
 
-/* App Section */
-.app-section {
-  padding: 80px 0;
-  background: white;
-}
 
-.app-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: center;
-}
-
-.app-title {
-  font-size: 36px;
-  font-weight: bold;
-  color: #1f2937;
-  margin-bottom: 24px;
-}
-
-.app-title-accent {
-  color: #2563eb;
-  display: block;
-}
-
-.app-description {
-  font-size: 18px;
-  color: #6b7280;
-  margin-bottom: 32px;
-  line-height: 1.6;
-}
-
-.app-buttons {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.app-btn {
-  background: #000;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background-color 0.3s;
-}
-
-.app-btn:hover {
-  background: #374151;
-}
-
-.app-mockup {
-  background: linear-gradient(135deg, #2563eb, #9333ea);
-  border-radius: 24px;
-  padding: 32px;
-  transform: rotate(3deg);
-  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-}
-
-.mockup-content {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  transform: rotate(-3deg);
-}
-
-.mockup-placeholder {
-  height: 320px;
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.mockup-icon {
-  width: 64px;
-  height: 64px;
-  background: #2563eb;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  margin-bottom: 16px; /* ✅ FIXED */
-}
-
-.mockup-placeholder h3 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 8px;
-}
-
-.mockup-placeholder p {
-  color: #6b7280;
-}
 
 /* CTA Section */
 .cta-section {
