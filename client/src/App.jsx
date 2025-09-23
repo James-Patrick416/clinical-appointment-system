@@ -4,11 +4,12 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Appointments from "./pages/Appointments.jsx";
 import Doctors from "./pages/Doctors.jsx";
 import Patients from "./pages/Patients.jsx";
-
+import LandingPage from "./pages/LandingPage.jsx";
 function App() {
   return (
     <Router>
       <Navbar />
+      <LandingPage/>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/appointments" element={<Appointments />} />
