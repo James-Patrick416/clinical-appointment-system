@@ -11,31 +11,7 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-      {/* Navigation */}
-      <nav className="navbar">
-        <div className="nav-container">
-          <div className="nav-content">
-            <div className="nav-logo">
-              <h1 className="logo-text">HealthCare</h1>
-            </div>
-            
-            <div className="nav-menu">
-              <div className="nav-links">
-                <a href="#home" className="nav-link active">Home</a>
-                <a href="#services" className="nav-link">Services</a>
-                <a href="#doctors" className="nav-link">Doctors</a>
-                <a href="#about" className="nav-link">About</a>
-                <button className="nav-btn">Book Appointment</button>
-              </div>
-            </div>
-            
-            <div className="mobile-menu-btn">
-              <button onClick={toggleMenu} className="menu-toggle">
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-          </div>
-        </div>
+      
 
         {/* Mobile menu */}
         {isMenuOpen && (
@@ -49,7 +25,7 @@ const LandingPage = () => {
             </div>
           </div>
         )}
-      </nav>
+      
 
       {/* Hero Section */}
       <section id="home" className="hero-section">
