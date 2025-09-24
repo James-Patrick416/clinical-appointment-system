@@ -86,3 +86,78 @@ button:focus-visible {
   transform: scale(1.05);
   opacity: 0.9;
 }
+
+/* Footer */
+.footer {
+  background: #ffffff; /* white background */
+  color: #1e3a8a;      /* deep blue text */
+  padding: 60px 0 30px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  gap: 40px; /* space between columns */
+  margin-bottom: 40px;
+}
+
+.footer-column {
+  line-height: 1.8;
+}
+
+.footer-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #1e3a8a; /* blue */
+}
+
+.footer-text {
+  font-size: 14px;
+  color: #2563eb; /* lighter blue */
+}
+
+.footer-heading {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1e3a8a;
+}
+
+.footer-list {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-list li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #2563eb;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.footer-list li:hover {
+  color: #1d4ed8; /* darker blue on hover */
+}
+
+.footer-contact p {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #2563eb;
+}
+
+.footer-bottom {
+  text-align: center;
+  font-size: 13px;
+  color: #1e3a8a;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 20px;
+}
