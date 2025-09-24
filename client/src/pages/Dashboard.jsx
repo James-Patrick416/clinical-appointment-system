@@ -1,238 +1,184 @@
 // src/pages/Dashboard.jsx
-import React, { useState, useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { appointmentsAPI, usersAPI, clinicsAPI } from '../api';
-import { Calendar, Users, Stethoscope, Activity } from 'lucide-react';
+import { appointmentsAPI, usersAPI } from '../api';
+import { format } from 'date-fns';
+import './Dashboard.css';
 
-export default function Dashboard() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalAppointments: 0,
-    pendingAppointments: 0,
-    totalPatients: 0,
-    totalDoctors: 0
-  });
-  const [recentAppointments, setRecentAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Dashboard = () => {
+    const { user } = useAuth();
+    const [appointments, setAppointments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [allUsers, setAllUsers] = useState([]);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const fetchedAppointments = await appointmentsAPI.getAll();
+                setAppointments(fetchedAppointments);
+                
+                if (user.role === 'clinic_admin') {
+                    const fetchedUsers = await usersAPI.getAll();
+                    setAllUsers(fetchedUsers);
+                }
+            } catch (err) {
+                setError('Failed to fetch data.');
+                console.error('Error fetching dashboard data:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
+        if (user) {
+            fetchData();
+        }
+    }, [user]);
 
-      let appointmentsData = await appointmentsAPI.getAll();
-      let appointments = appointmentsData || [];
+    const handleUpdateAppointment = async (id, status) => {
+        try {
+            await appointmentsAPI.update(id, { status });
+            setAppointments(prev => prev.map(app => 
+                app.id === id ? { ...app, status } : app
+            ));
+        } catch (err) {
+            setError('Failed to update appointment status.');
+            console.error('Error updating appointment:', err);
+        }
+    };
 
-      if (user?.role === 'patient') {
-        appointments = appointments.filter(a => a.patient_id === user.id);
-      } else if (user?.role === 'doctor') {
-        appointments = appointments.filter(a => a.doctor_id === user.id);
-      }
-
-      let usersData = [];
-      if (user?.role === 'admin') {
-        usersData = await usersAPI.getAll();
-      }
-
-      let clinicsData = [];
-      if (user?.role === 'doctor') {
-        clinicsData = await clinicsAPI.getAll();
-      }
-
-      let statsData = {
-        totalAppointments: appointments.length,
-        pendingAppointments: appointments.filter(a => a.status === 'scheduled').length,
-        totalPatients: 0,
-        totalDoctors: 0
-      };
-
-      if (user?.role === 'admin') {
-        statsData.totalPatients = usersData.filter(u => u.role === 'patient').length;
-        statsData.totalDoctors = usersData.filter(u => u.role === 'doctor').length;
-      } else if (user?.role === 'doctor') {
-        const doctorPatients = new Set(appointments.map(a => a.patient_id).filter(id => id));
-        statsData.totalPatients = doctorPatients.size;
-
-        const clinicDoctors = clinicsData.flatMap(c => (c.doctors || []).map(d => d.id));
-        statsData.totalDoctors = new Set(clinicDoctors).size;
-      }
-
-      const recent = appointments
-        .sort((a, b) => {
-          const dateTimeB = new Date(b.date + 'T' + (b.time ?? '')) ?? new Date(0);
-          const dateTimeA = new Date(a.date + 'T' + (a.time ?? '')) ?? new Date(0);
-          return dateTimeB - dateTimeA;
-        })
-        .slice(0, 5);
-
-      setStats(statsData);
-      setRecentAppointments(recent);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setLoading(false);
+    if (!user) {
+        return <div className="dashboard-container">Please log in to view the dashboard.</div>;
     }
-  };
 
-  const StatCard = ({ icon: Icon, title, value, color }) => (
-    <div style={{
-      background: 'white',
-      padding: '25px',
-      borderRadius: '12px',
-      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-      textAlign: 'center'
-    }}>
-      <div style={{
-        width: '50px',
-        height: '50px',
-        background: color + '20',
-        borderRadius: '50%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        margin: '0 auto 15px',
-        color: color
-      }}>
-        <Icon size={24} />
-      </div>
-      <h3 style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0 0 5px 0', color: '#1f2937' }}>
-        {value}
-      </h3>
-      <p style={{ color: '#6b7280', margin: 0 }}>{title}</p>
-    </div>
-  );
+    if (loading) {
+        return <div className="dashboard-container">Loading dashboard...</div>;
+    }
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+    const today = format(new Date(), 'yyyy-MM-dd');
 
-  const formatTime = (timeString) => {
-    const timeDate = new Date(`2000-01-01T${timeString}`);
-    return isNaN(timeDate.getTime()) ? 'Invalid Time' : timeDate.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
+    const renderPatientDashboard = () => {
+        const patientAppointments = appointments.filter(app => app.patient_id === user.id);
+        const upcomingAppointments = patientAppointments.filter(app => app.status === 'scheduled' && app.date >= today);
+        const pastAppointments = patientAppointments.filter(app => app.status !== 'scheduled' || app.date < today);
 
-  if (loading) {
-    return (
-      <div style={{ padding: '40px 20px', textAlign: 'center', color: '#6b7280' }}>
-        Loading dashboard...
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto', minHeight: '80vh' }}>
-      {/* Welcome Section */}
-      <div style={{ marginBottom: '40px' }}>
-        <h1 style={{ color: '#2563eb', fontSize: '2.5rem', marginBottom: '10px' }}>
-          Welcome back, {user?.name || 'User'}!
-        </h1>
-        <p style={{ fontSize: '1.1rem', color: '#6b7280' }}>
-          {user?.role === 'admin' ? 'System Overview' :
-           user?.role === 'doctor' ? 'Your Medical Practice' :
-           'Your Health Dashboard'}
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-        gap: '20px', 
-        marginBottom: '40px' 
-      }}>
-        <StatCard icon={Calendar} title="Total Appointments" value={stats.totalAppointments} color="#2563eb" />
-        <StatCard icon={Activity} title="Pending Appointments" value={stats.pendingAppointments} color="#d97706" />
-        {(user?.role === 'admin' || user?.role === 'doctor') && (
-          <StatCard icon={Users} title="Total Patients" value={stats.totalPatients} color="#16a34a" />
-        )}
-        {(user?.role === 'admin' || user?.role === 'doctor') && (
-          <StatCard icon={Stethoscope} title="Total Doctors" value={stats.totalDoctors} color="#dc2626" />
-        )}
-      </div>
-
-      {/* Recent Appointments */}
-      <div style={{ background: 'white', borderRadius: '12px', padding: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-        <h2 style={{ marginBottom: '20px', color: '#1f2937' }}>Recent Appointments</h2>
-        {recentAppointments.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-            <Calendar size={48} style={{ marginBottom: '10px', opacity: 0.5 }} />
-            <p>No appointments found</p>
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gap: '15px' }}>
-            {recentAppointments.map(appt => (
-              <div key={appt.id} style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '15px',
-                background: '#f8fafc',
-                borderRadius: '8px',
-                borderLeft: `4px solid ${
-                  appt.status === 'completed' ? '#16a34a' :
-                  appt.status === 'cancelled' ? '#dc2626' : '#d97706'
-                }`
-              }}>
-                <div style={{ flex: 1 }}>
-                  <h4 style={{ margin: '0 0 5px 0', color: '#1f2937' }}>
-                    {user?.role === 'doctor' ? `Patient: ${appt.patient_name || 'Unknown'}` : `Dr. ${appt.doctor_name || 'Unknown'}`}
-                  </h4>
-                  <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>
-                    {formatDate(appt.date)} at {formatTime(appt.time)} • {appt.clinic_name || 'Unknown Clinic'}
-                  </p>
+        return (
+            <div className="dashboard-content">
+                <h2 className="dashboard-subtitle">Welcome, {user.name}!</h2>
+                <div className="card-container">
+                    <div className="dashboard-card primary-card">
+                        <h3>Upcoming Appointments</h3>
+                        <p>{upcomingAppointments.length}</p>
+                    </div>
+                    <div className="dashboard-card">
+                        <h3>Past Appointments</h3>
+                        <p>{pastAppointments.length}</p>
+                    </div>
                 </div>
-                <span style={{
-                  padding: '4px 12px',
-                  background: appt.status === 'completed' ? '#dcfce7' :
-                             appt.status === 'cancelled' ? '#fef2f2' : '#fffbeb',
-                  color: appt.status === 'completed' ? '#16a34a' :
-                         appt.status === 'cancelled' ? '#dc2626' : '#d97706',
-                  borderRadius: '20px',
-                  fontSize: '0.8rem',
-                  fontWeight: 'bold',
-                  textTransform: 'capitalize'
-                }}>
-                  {appt.status || 'Unknown'}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+                
+                <h3 className="section-title">Your Appointments</h3>
+                {upcomingAppointments.length > 0 ? (
+                    <div className="appointment-list">
+                        {upcomingAppointments.map(app => (
+                            <div key={app.id} className="appointment-item">
+                                <p><strong>Doctor:</strong> {app.doctor_name}</p>
+                                <p><strong>Clinic:</strong> {app.clinic_name}</p>
+                                <p><strong>Date:</strong> {format(new Date(app.date), 'MMMM d, yyyy')}</p>
+                                <p><strong>Time:</strong> {app.time}</p>
+                                <span className={`appointment-status status-${app.status}`}>{app.status}</span>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p>You have no upcoming appointments.</p>
+                )}
+            </div>
+        );
+    };
 
-      {/* Quick Actions */}
-      <div style={{ marginTop: '40px', textAlign: 'center' }}>
-        <h3 style={{ marginBottom: '20px', color: '#1f2937' }}>Quick Actions</h3>
-        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button onClick={() => navigate('/appointments')} style={{ padding: '12px 24px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1rem' }}>
-            View Appointments
-          </button>
+    const renderDoctorDashboard = () => {
+        const doctorAppointments = appointments.filter(app => app.doctor_id === user.id);
+        const upcomingAppointments = doctorAppointments.filter(app => app.status === 'scheduled' && app.date >= today);
+        const completedAppointments = doctorAppointments.filter(app => app.status === 'completed');
 
-          {user?.role === 'patient' && (
-            <button onClick={() => navigate('/doctors')} style={{ padding: '12px 24px', background: '#16a34a', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1rem' }}>
-              Book Appointment
-            </button>
-          )}
+        return (
+            <div className="dashboard-content">
+                <h2 className="dashboard-subtitle">Dr. {user.name}, your day is ready.</h2>
+                <div className="card-container">
+                    <div className="dashboard-card primary-card">
+                        <h3>Today's Appointments</h3>
+                        <p>{upcomingAppointments.filter(app => app.date === today).length}</p>
+                    </div>
+                    <div className="dashboard-card">
+                        <h3>Upcoming Total</h3>
+                        <p>{upcomingAppointments.length}</p>
+                    </div>
+                    <div className="dashboard-card">
+                        <h3>Completed</h3>
+                        <p>{completedAppointments.length}</p>
+                    </div>
+                </div>
 
-          {(user?.role === 'admin' || user?.role === 'doctor') && (
-            <button onClick={() => navigate('/patients')} style={{ padding: '12px 24px', background: '#d97706', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1rem' }}>
-              Manage Patients
-            </button>
-          )}
+                <h3 className="section-title">Upcoming Patient Appointments</h3>
+                {upcomingAppointments.length > 0 ? (
+                    <div className="appointment-list">
+                        {upcomingAppointments.map(app => (
+                            <div key={app.id} className="appointment-item">
+                                <p><strong>Patient:</strong> {app.patient_name}</p>
+                                <p><strong>Date:</strong> {format(new Date(app.date), 'MMMM d, yyyy')}</p>
+                                <p><strong>Time:</strong> {app.time}</p>
+                                <div className="appointment-actions">
+                                    <button className="complete-btn" onClick={() => handleUpdateAppointment(app.id, 'completed')}>Complete</button>
+                                    <button className="cancel-btn" onClick={() => handleUpdateAppointment(app.id, 'cancelled')}>Cancel</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p>You have no upcoming appointments.</p>
+                )}
+            </div>
+        );
+    };
+
+    const renderAdminDashboard = () => {
+        const totalPatients = allUsers.filter(u => u.role === 'patient').length;
+        const totalDoctors = allUsers.filter(u => u.role === 'doctor').length;
+        const totalAppointments = appointments.length;
+
+        return (
+            <div className="dashboard-content">
+                <h2 className="dashboard-subtitle">Admin Dashboard</h2>
+                <div className="card-container">
+                    <div className="dashboard-card primary-card">
+                        <h3>Total Appointments</h3>
+                        <p>{totalAppointments}</p>
+                    </div>
+                    <div className="dashboard-card">
+                        <h3>Total Doctors</h3>
+                        <p>{totalDoctors}</p>
+                    </div>
+                    <div className="dashboard-card">
+                        <h3>Total Patients</h3>
+                        <p>{totalPatients}</p>
+                    </div>
+                </div>
+                
+                <h3 className="section-title">Recent Activity</h3>
+                <p>Use the navigation to manage doctors, patients, and appointments.</p>
+            </div>
+        );
+    };
+
+    return (
+        <div className="dashboard-container">
+            {user.role === 'patient' && renderPatientDashboard()}
+            {user.role === 'doctor' && renderDoctorDashboard()}
+            {user.role === 'clinic_admin' && renderAdminDashboard()}
         </div>
-      </div>
-    </div>
-  );
-}
+    );
+};
+
+export default Dashboard;

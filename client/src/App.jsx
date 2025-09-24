@@ -1,3 +1,5 @@
+// src/App.jsx
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext.jsx";
@@ -5,10 +7,10 @@ import Navbar from "./components/Navbar.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Appointments from "./pages/Appointments.jsx";
 import Doctors from "./pages/Doctors.jsx";
-import Patients from "./pages/Patients.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
 import Login from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
+import AdminDoctors from "./pages/AdminDoctors.jsx"; // NEW IMPORT
 
 function App() {
   const { user, loading } = useAuth();
@@ -26,6 +28,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/doctors" element={<Doctors />} />
         <Route
           path="/login"
           element={!user ? <Login /> : <Navigate to="/dashboard" replace />}
@@ -60,27 +63,17 @@ function App() {
             )
           }
         />
+
+        {/* Admin Protected Route for CRUD */}
         <Route
-          path="/doctors"
+          path="/admin/doctors" // NEW ROUTE
           element={
-            user ? (
+            user && user.role === 'clinic_admin' ? (
               <AuthenticatedLayout>
-                <Doctors />
+                <AdminDoctors /> 
               </AuthenticatedLayout>
             ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        <Route
-          path="/patients"
-          element={
-            user ? (
-              <AuthenticatedLayout>
-                <Patients />
-              </AuthenticatedLayout>
-            ) : (
-              <Navigate to="/login" replace />
+              <Navigate to={user ? "/dashboard" : "/login"} replace />
             )
           }
         />

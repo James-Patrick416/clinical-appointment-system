@@ -1,35 +1,68 @@
 // src/api/index.js
-const BASE_URL = 'http://localhost:5000'; // backend URL
+
+// **Important: Ensure this BASE_URL matches your Flask server address.**
+const BASE_URL = 'http://localhost:5555';
+
+// Helper function for making authenticated requests
+const authenticatedFetch = async (endpoint, options = {}) => {
+    const token = localStorage.getItem('token');
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+    };
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+        ...options,
+        headers,
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `API call failed with status ${response.status}`);
+    }
+
+    return response.json();
+};
+
+export const authAPI = {
+    login: (credentials) => authenticatedFetch('/login', {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+    }),
+    register: (userData) => authenticatedFetch('/register', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+    }),
+};
 
 export const usersAPI = {
-  getAll: async () => {
-    const res = await fetch(`${BASE_URL}/users`);
-    if (!res.ok) throw new Error('Failed to fetch users');
-    return res.json();
-  }
+    getAll: () => authenticatedFetch('/users'),
+    // Note: The /register endpoint is used for creating new users (doctors/admins) in the Admin panel
+    update: (id, userData) => authenticatedFetch(`/users/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(userData),
+    }),
+    delete: (id) => authenticatedFetch(`/users/${id}`, {
+        method: 'DELETE',
+    }),
 };
 
 export const appointmentsAPI = {
-  getAll: async () => {
-    const res = await fetch(`${BASE_URL}/appointments`);
-    if (!res.ok) throw new Error('Failed to fetch appointments');
-    return res.json();
-  },
-  update: async (id, data) => {
-    const res = await fetch(`${BASE_URL}/appointments/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error('Failed to update appointment');
-    return res.json();
-  }
+    getAll: () => authenticatedFetch('/appointments'),
+    create: (appointmentData) => authenticatedFetch('/appointments', {
+        method: 'POST',
+        body: JSON.stringify(appointmentData),
+    }),
+    update: (id, appointmentData) => authenticatedFetch(`/appointments/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(appointmentData),
+    }),
 };
 
 export const clinicsAPI = {
-  getAll: async () => {
-    const res = await fetch(`${BASE_URL}/clinics`);
-    if (!res.ok) throw new Error('Failed to fetch clinics');
-    return res.json();
-  }
+    getAll: () => authenticatedFetch('/clinics'),
 };

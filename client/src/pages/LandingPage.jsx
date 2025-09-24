@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MessageCircle, Heart, Activity, Pill, Star, Download } from 'lucide-react';
+import { Search, Calendar, MessageCircle, Heart, Activity, Pill, Star, Download, Menu, X } from 'lucide-react';
 import './LandingPage.css';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,18 +16,39 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="mobile-menu">
-          <div className="mobile-menu-content">
-            <a href="#home" className="mobile-link active">Home</a>
-            <a href="#services" className="mobile-link">Services</a>
-            <a href="#doctors" className="mobile-link">Doctors</a>
-            <a href="#about" className="mobile-link">About</a>
-            <button className="mobile-btn">Book Appointment</button>
+      {/* Navbar */}
+      <nav className="navbar">
+        <div className="nav-container container">
+          <Link to="/" className="logo-text">HealthCare</Link>
+          <div className="nav-menu">
+            <div className="nav-links">
+              <a href="#home" className="nav-link active">Home</a>
+              <a href="#services" className="nav-link">Services</a>
+              <a href="#doctors" className="nav-link">Doctors</a>
+              <a href="#about" className="nav-link">About</a>
+            </div>
+            <Link to="/login" className="nav-btn">
+              Book Appointment
+            </Link>
           </div>
+          <button className="mobile-menu-btn" onClick={toggleMenu}>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
-      )}
+      </nav>
+
+      {/* Mobile menu */}
+      <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
+        <div className="mobile-menu-content">
+          <a href="#home" className="mobile-link active" onClick={toggleMenu}>Home</a>
+          <a href="#services" className="mobile-link" onClick={toggleMenu}>Services</a>
+          <a href="#doctors" className="mobile-link" onClick={toggleMenu}>Doctors</a>
+          <a href="#about" className="mobile-link" onClick={toggleMenu}>About</a>
+          <Link to="/login" className="mobile-btn" onClick={toggleMenu}>
+            Book Appointment
+          </Link>
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section id="home" className="hero-section">
@@ -43,8 +65,12 @@ const LandingPage = () => {
                 that will make you feel confident and safe in your daily life.
               </p>
               <div className="hero-buttons">
-                <button className="btn-primary">Find A Doctor</button>
-                <button className="btn-secondary">Learn More</button>
+                <Link to="/doctors" className="btn-primary">
+                  Find A Doctor
+                </Link>
+                <a href="#about" className="btn-secondary">
+                  Learn More
+                </a>
               </div>
             </div>
 
@@ -69,6 +95,9 @@ const LandingPage = () => {
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">3 Easy Steps and Get Your Solution</h2>
+            <p className="section-description">
+              Find your doctor easily with a minimum of effort. We've kept everything organised for you.
+            </p>
           </div>
           <div className="steps-grid">
             <div className="step-card">
@@ -141,9 +170,21 @@ const LandingPage = () => {
             </p>
           </div>
           <div className="services-grid">
-            <div className="service-card red"><Heart size={32} /><h3>Cardiology</h3><p>Skilled in diagnosing and treating cardiovascular system diseases.</p></div>
-            <div className="service-card blue"><Activity size={32} /><h3>Pulmonology</h3><p>Skilled in diagnosing and treating respiratory system diseases.</p></div>
-            <div className="service-card green"><Pill size={32} /><h3>Medicine</h3><p>Skilled in diagnosing and treating diseases with the latest medicine systems.</p></div>
+            <div className="service-card red">
+              <div className="service-icon red"><Heart size={32} /></div>
+              <h3 className="service-title">Cardiology</h3>
+              <p className="service-description">Skilled in diagnosing and treating cardiovascular system diseases.</p>
+            </div>
+            <div className="service-card blue">
+              <div className="service-icon blue"><Activity size={32} /></div>
+              <h3 className="service-title">Pulmonology</h3>
+              <p className="service-description">Skilled in diagnosing and treating respiratory system diseases.</p>
+            </div>
+            <div className="service-card green">
+              <div className="service-icon green"><Pill size={32} /></div>
+              <h3 className="service-title">Medicine</h3>
+              <p className="service-description">Skilled in diagnosing and treating diseases with the latest medicine systems.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -159,12 +200,15 @@ const LandingPage = () => {
             {doctors.map((doctor, index) => (
               <div key={index} className="doctor-card">
                 <div className={`doctor-avatar ${doctor.color}`}>
-                  {doctor.name.split(' ')[1]?.[0] || doctor.name[0]}
+                  {doctor.name.split(' ').map(n => n[0]).join('')}
                 </div>
                 <h3 className="doctor-name">{doctor.name}</h3>
                 <p className="doctor-specialty">{doctor.specialty}</p>
-                <div className="doctor-rating"><Star size={16} /><span>{doctor.rating}</span></div>
-                <button className="doctor-btn">Book Now</button>
+                <div className="doctor-rating">
+                  <Star size={16} fill="currentColor" />
+                  <span>{doctor.rating}</span>
+                </div>
+                <Link to="/login" className="doctor-btn">Book Now</Link>
               </div>
             ))}
           </div>
@@ -193,7 +237,7 @@ const LandingPage = () => {
           <div className="cta-content">
             <h2 className="cta-title">It's Time... Change Your Life</h2>
             <p className="cta-description">Start your journey to better health today with our expert medical team and cutting-edge technology.</p>
-            <button className="cta-btn">Get Started Now</button>
+            <Link to="/register" className="cta-btn">Get Started Now</Link>
           </div>
         </div>
       </section>
