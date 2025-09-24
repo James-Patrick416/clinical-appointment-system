@@ -1,57 +1,58 @@
-<<<<<<< HEAD
-=======
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
-import Doctors from "./pages/Doctors";
 import Appointments from "./pages/Appointments";
+import Doctors from "./pages/Doctors";
 import Patients from "./pages/Patients";
-import "./App.css";
-import ClinicManager from "./ClinicManager";
-import "./styles/ClinicManager.css";
+import LandingPage from "./pages/LandingPage";
+import Login from "./components/Login";
+import Register from "./components/Register";
 
+function App() {
+  const { user, loading } = useAuth();
 
+  if (loading) {
+    return <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>Loading...</div>;
+  }
 
-function Layout() {
-  const location = useLocation();
-
-  return (
-    <div className="app-container">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <h2>Clinical Appointment System</h2>
-        <nav>
-          <Link className={location.pathname === "/dashboard" ? "active" : ""} to="/dashboard">Dashboard</Link>
-          <Link className={location.pathname === "/appointments" ? "active" : ""} to="/appointments">Appointments</Link>
-          <Link className={location.pathname === "/patients" ? "active" : ""} to="/patients">Patients</Link>
-          <Link className={location.pathname === "/doctors" ? "active" : ""} to="/doctors">Doctors</Link>
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <main className="main">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/appointments" element={<Appointments />} />
-          <Route path="/patients" element={<Patients />} />
-          <Route path="/doctors" element={<Doctors />} />
-          <Route path="*" element={<h2 style={{ padding: "2rem" }}>404 - Page Not Found</h2>} />
-        </Routes>
-      </main>
-    </div>
-  );
-
-  function App() {
-  return <ClinicManager />;
-}
-
-}
-
-export default function App() {
   return (
     <Router>
-      <Layout />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" replace />} />
+        
+        <Route 
+          path="/dashboard" 
+          element={user ? <AuthenticatedLayout><Dashboard /></AuthenticatedLayout> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/appointments" 
+          element={user ? <AuthenticatedLayout><Appointments /></AuthenticatedLayout> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/doctors" 
+          element={user ? <AuthenticatedLayout><Doctors /></AuthenticatedLayout> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/patients" 
+          element={user ? <AuthenticatedLayout><Patients /></AuthenticatedLayout> : <Navigate to="/login" replace />} 
+        />
+        
+        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} replace />} />
+      </Routes>
     </Router>
   );
 }
->>>>>>> c90f94b124cf2fef1a0d89628dbdfbaa224fa835
+
+function AuthenticatedLayout({ children }) {
+  return (
+    <div style={{ minHeight: '100vh' }}>
+      <Navbar />
+      <main style={{ paddingTop: '20px' }}>{children}</main>
+    </div>
+  );
+}
+
+export default App;
