@@ -32,9 +32,11 @@ const LandingPage = () => {
       <section id="home" className="hero-section">
         <div className="container">
           <div className="hero-grid">
+            {/* Left side: content */}
             <div className="hero-content">
               <h1 className="hero-title">
-                Find And Search Your <span className="hero-title-accent">Suitable Doctor's</span>
+                Find And Search Your
+                <span className="hero-title-accent">Suitable Doctor's</span>
               </h1>
               <p className="hero-description">
                 Join us and take care of yourself and your family with health services 
@@ -45,14 +47,16 @@ const LandingPage = () => {
                 <button className="btn-secondary">Learn More</button>
               </div>
             </div>
+
+            {/* Right side: real image instead of placeholder */}
             <div className="hero-image">
               <div className="image-card">
                 <div className="image-content">
-                  <div className="placeholder-image">
-                    <Heart size={64} />
-                    <h3>Your Health</h3>
-                    <p>Our Priority</p>
-                  </div>
+                  <img
+                    src="/doctor2.jpeg"
+                    alt="Doctor"
+                    className="hero-real-image"
+                  />
                 </div>
               </div>
             </div>
@@ -96,26 +100,30 @@ const LandingPage = () => {
       <section className="quality-section">
         <div className="container">
           <div className="quality-grid">
+            {/* Left side: real image instead of placeholder */}
             <div className="quality-image">
               <div className="quality-card">
                 <div className="quality-content">
-                  <div className="quality-placeholder">
-                    <Star size={64} />
-                    <h3>Quality Care</h3>
-                    <p>24/7 Available</p>
-                  </div>
+                  <img 
+                    src="/doctor1.jpeg"
+                    alt="Quality healthcare service"
+                    className="quality-real-image"
+                  />
                 </div>
               </div>
             </div>
+            {/* Right side: text */}
             <div className="quality-text">
-              <h2 className="quality-title">Best quality service with our experienced doctors</h2>
+              <h2 className="quality-title">
+                Best quality service with our experienced doctors
+              </h2>
               <p className="quality-description">
                 With our top doctors, we are able to provide best medical services above average. 
-                Highly experienced doctors ensure the best care.
+                We have highly experienced doctors, so don't worry. They are also very talented in their fields.
               </p>
               <ul className="quality-list">
                 <li>Search your specialist & Online consultations anywhere</li>
-                <li>Consultation with top specialists</li>
+                <li>Consultation our top specialists</li>
                 <li>Doctors are available 24/7</li>
               </ul>
             </div>

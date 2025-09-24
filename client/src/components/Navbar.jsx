@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom'; // Add this import
+import { useNavigate, Link } from 'react-router-dom';
+import { Menu, X, Calendar, Users, Stethoscope, Activity } from 'lucide-react';
 import { appointmentsAPI, usersAPI, clinicsAPI } from '../api';
-import { Calendar, Users, Stethoscope, Activity } from 'lucide-react';
+
 
 export default function Dashboard() {
-  const { user } = useAuth();
-  const navigate = useNavigate(); // Add this line
+  const { user, isAuthenticated } = useAuth(); // Assuming isAuthenticated comes from context
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalAppointments: 0,
     pendingAppointments: 0,
@@ -15,6 +16,20 @@ export default function Dashboard() {
   });
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleAuth = () => {
+    if (isAuthenticated) {
+      // handle sign out
+      console.log("Signed out");
+    } else {
+      // navigate to sign in page
+      navigate("/signin");
+    }
+  };
+
 
   useEffect(() => {
     fetchDashboardData();
@@ -131,7 +146,7 @@ export default function Dashboard() {
       hour12: true
     });
   };
-
+  
   if (loading) {
     return (
       <div style={{ padding: '40px 20px', textAlign: 'center', color: '#6b7280' }}>
@@ -141,162 +156,38 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto', minHeight: '80vh' }}>
-      {/* Welcome Section */}
-      <div style={{ marginBottom: '40px' }}>
-        <h1 style={{ color: '#2563eb', fontSize: '2.5rem', marginBottom: '10px' }}>
-          Welcome back, {user?.name || 'User  '}!
-        </h1>
-        <p style={{ fontSize: '1.1rem', color: '#6b7280' }}>
-          {user?.role === 'admin' ? 'System Overview' : 
-           user?.role === 'doctor' ? 'Your Medical Practice' : 
-           'Your Health Dashboard'}
-        </p>
-      </div>
+    <nav className="navbar">
+      <div className="nav-container">
+        <div className="nav-content">
+          {/* Logo */}
+          <div className="nav-logo">
+            <Link to="/">
+              <img src="/logo1.jpeg" alt="HealthCare Logo" className="logo-img" />
 
-      {/* Stats Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-        gap: '20px', 
-        marginBottom: '40px' 
-      }}>
-        <StatCard 
-          icon={Calendar} 
-          title="Total Appointments" 
-          value={stats.totalAppointments} 
-          color="#2563eb" 
-        />
-        <StatCard 
-          icon={Activity} 
-          title="Pending Appointments" 
-          value={stats.pendingAppointments} 
-          color="#d97706" 
-        />
-        {(user?.role === 'admin' || user?.role === 'doctor') && (
-          <StatCard 
-            icon={Users} 
-            title="Total Patients" 
-            value={stats.totalPatients} 
-            color="#16a34a" 
-          />
-        )}
-        {(user?.role === 'admin' || user?.role === 'doctor') && (
-          <StatCard 
-            icon={Stethoscope} 
-            title="Total Doctors" 
-            value={stats.totalDoctors} 
-            color="#dc2626" 
-          />
-        )}
-      </div>
-
-      {/* Recent Appointments */}
-      <div style={{ background: 'white', borderRadius: '12px', padding: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-        <h2 style={{ marginBottom: '20px', color: '#1f2937' }}>Recent Appointments</h2>
-        
-        {recentAppointments.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-            <Calendar size={48} style={{ marginBottom: '10px', opacity: 0.5 }} />
-            <p>No appointments found</p>
+            </Link>
           </div>
-        ) : (
-          <div style={{ display: 'grid', gap: '15px' }}>
-            {recentAppointments.map(appt => (
-              <div key={appt.id} style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '15px',
-                background: '#f8fafc',
-                borderRadius: '8px',
-                borderLeft: `4px solid ${
-                  appt.status === 'completed' ? '#16a34a' : 
-                  appt.status === 'cancelled' ? '#dc2626' : '#d97706'
-                }`
-              }}>
-                <div style={{ flex: 1 }}>
-                  <h4 style={{ margin: '0 0 5px 0', color: '#1f2937' }}>
-                    {user?.role === 'doctor' 
-                      ? `Patient: ${appt.patient_name || 'Unknown'}` 
-                      : `Dr. ${appt.doctor_name || 'Unknown'}`}
-                  </h4>
-                  <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>
-                    {formatDate(appt.date)} at {formatTime(appt.time)} • {appt.clinic_name || 'Unknown Clinic'}
-                  </p>
-                </div>
-                <span style={{
-                  padding: '4px 12px',
-                  background: appt.status === 'completed' ? '#dcfce7' : 
-                             appt.status === 'cancelled' ? '#fef2f2' : '#fffbeb',
-                  color: appt.status === 'completed' ? '#16a34a' : 
-                         appt.status === 'cancelled' ? '#dc2626' : '#d97706',
-                  borderRadius: '20px',
-                  fontSize: '0.8rem',
-                  fontWeight: 'bold',
-                  textTransform: 'capitalize'
-                }}>
-                  {appt.status || 'Unknown'}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* Quick Actions */}
-      <div style={{ marginTop: '40px', textAlign: 'center' }}>
-        <h3 style={{ marginBottom: '20px', color: '#1f2937' }}>Quick Actions</h3>
-        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button 
-            onClick={() => navigate('/appointments')} // Fixed: Navigate to appointments
-            style={{
-              padding: '12px 24px',
-              background: '#2563eb',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '1rem'
-            }}
-          >
-            View Appointments
-          </button>
-          
-          {user?.role === 'patient' && (
-            <button 
-              onClick={() => navigate('/doctors')} // Fixed: Navigate to doctors (for booking)
-              style={{
-                padding: '12px 24px',
-                background: '#16a34a',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
-            >
-              Book Appointment
-            </button>
-          )}
-          
-          {(user?.role === 'admin' || user?.role === 'doctor') && (
-            <button 
-              onClick={() => navigate('/patients')} // Fixed: Navigate to patients
-              style={{
-                padding: '12px 24px',
-                background: '#d97706',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
-            >
-              Manage Patients
-            </button>
-          )}
+          {/* Desktop Menu */}
+          <div className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
+            <div className="nav-links">
+              {/* landing page sections */}
+              <a href="#home" className="nav-link active">Home</a>
+              <a href="#services" className="nav-link">Services</a>
+              <a href="#doctors" className="nav-link">Doctors</a>
+              <a href="#about" className="nav-link">About</a>
+
+              {/* Auth button */}
+              <button onClick={handleAuth} className="nav-btn">
+                {isAuthenticated ? "Sign Out" : "Sign In"}
+              </button>
+            </div>
+          </div>
+          {/* Mobile menu toggle */}
+          <div className="menu-toggle" onClick={toggleMenu}>
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }
