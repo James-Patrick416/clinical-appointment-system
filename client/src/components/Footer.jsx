@@ -34,9 +34,9 @@ export default function Footer() {
           <div className="footer-column">
             <h4 className="footer-heading">Contact</h4>
             <div className="footer-contact">
-              <p>📞 +1 (555) 123-4567</p>
-              <p>✉️ info@healthcare.com</p>
-              <p>📍 123 Health St, Medical City</p>
+              <p>📞 +2547890567830</p>
+              <p>✉️ help@healthcare.com</p>
+              <p>📍 Healthcare medical city</p>
             </div>
           </div>
         </div>
